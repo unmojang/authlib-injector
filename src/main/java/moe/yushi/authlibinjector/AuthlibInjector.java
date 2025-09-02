@@ -61,6 +61,7 @@ import moe.yushi.authlibinjector.transform.support.BungeeCordProfileKeyTransform
 import moe.yushi.authlibinjector.transform.support.CitizensTransformer;
 import moe.yushi.authlibinjector.transform.support.ConcatenateURLTransformUnit;
 import moe.yushi.authlibinjector.transform.support.ConstantURLTransformUnit;
+import moe.yushi.authlibinjector.transform.support.FetchMissingTexturesByPlayerName;
 import moe.yushi.authlibinjector.transform.support.MC52974Workaround;
 import moe.yushi.authlibinjector.transform.support.MC52974_1710Workaround;
 import moe.yushi.authlibinjector.transform.support.MainArgumentsTransformer;
@@ -223,16 +224,13 @@ public final class AuthlibInjector {
 		return a.equals(b);
 	}
 
-	private static List<URLFilter> createFilters(APIMetadata config) {
+	private static List<URLFilter> createFilters(APIMetadata config, YggdrasilClient customClient, YggdrasilClient mojangClient) {
 		if (Config.httpdDisabled) {
 			log(INFO, "Disabled local HTTP server");
 			return emptyList();
 		}
 
 		List<URLFilter> filters = new ArrayList<>();
-
-		YggdrasilClient customClient = new YggdrasilClient(new CustomYggdrasilAPIProvider(config));
-		YggdrasilClient mojangClient = new YggdrasilClient(new MojangYggdrasilAPIProvider(), Config.mojangProxy);
 
 		boolean legacySkinPolyfillDefault = !Boolean.TRUE.equals(config.getMeta().get("feature.legacy_skin_api"));
 		if (Config.legacySkinPolyfill.isEnabled(legacySkinPolyfillDefault)) {
@@ -265,7 +263,10 @@ public final class AuthlibInjector {
 	}
 
 	private static ClassTransformer createTransformer(APIMetadata config) {
-		URLProcessor urlProcessor = new URLProcessor(createFilters(config), new DefaultURLRedirector(config));
+		YggdrasilClient customClient = new YggdrasilClient(new CustomYggdrasilAPIProvider(config));
+		YggdrasilClient mojangClient = new YggdrasilClient(new MojangYggdrasilAPIProvider(), Config.mojangProxy);
+
+		URLProcessor urlProcessor = new URLProcessor(createFilters(config, customClient, mojangClient), new DefaultURLRedirector(config));
 
 		ClassTransformer transformer = new ClassTransformer();
 		transformer.setIgnores(Config.ignoredPackages);
@@ -282,6 +283,9 @@ public final class AuthlibInjector {
 		transformer.units.add(new ConstantURLTransformUnit(urlProcessor));
 		transformer.units.add(new CitizensTransformer());
 		transformer.units.add(new ConcatenateURLTransformUnit());
+
+		FetchMissingTexturesByPlayerName.setYggdrasilClient(customClient);
+		transformer.units.add(new FetchMissingTexturesByPlayerName());
 
 		boolean usernameCheckDefault = Boolean.TRUE.equals(config.getMeta().get("feature.username_check"));
 		if (Config.usernameCheck.isEnabled(usernameCheckDefault)) {
