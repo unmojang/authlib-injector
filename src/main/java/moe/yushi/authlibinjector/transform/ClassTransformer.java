@@ -137,7 +137,7 @@ public class ClassTransformer implements ClassFileTransformer {
 		public void accept(TransformUnit... units) {
 			long t0 = System.nanoTime();
 
-			ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+			ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
 
 			TransformContextImpl[] ctxs = new TransformContextImpl[units.length];
 			ClassVisitor chain = writer;
@@ -204,7 +204,7 @@ public class ClassTransformer implements ClassFileTransformer {
 			}
 
 			ClassReader reader = getClassReader();
-			ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
+			ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
 			ClassVisitor visitor = new ClassVisitor(ASM9, writer) {
 				@Override
 				public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
@@ -218,7 +218,7 @@ public class ClassTransformer implements ClassFileTransformer {
 
 		private void injectGeneratedMethods() {
 			ClassReader reader = getClassReader();
-			ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
+			ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
 			ClassVisitor visitor = new ClassVisitor(ASM9, writer) {
 				@Override
 				public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
