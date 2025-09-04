@@ -23,7 +23,7 @@ jobs:
       name: Build
       shell: bash
       run: |
-        export AI_VERSION_NUMBER=${{ github.ref_name }}
+        export AI_VERSION_NUMBER=$(echo "${{ github.ref_name }}" | sed 's/^v//')
         ./gradlew
         ./gradlew test
         asset_path="$(echo build/libs/*.jar)"
