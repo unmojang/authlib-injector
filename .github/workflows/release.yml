@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+    - "v*"
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 17
+
+    - id: build
+      name: Build
+      shell: bash
+      run: |
+        export AI_VERSION_NUMBER=${{ github.ref_name }}
+        ./gradlew
+        ./gradlew test
+        asset_path="$(echo build/libs/*.jar)"
+        echo "Build output is at $asset_path"
+
+    - name: Create GitHub Release (Draft)
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+        tag_name: ${{ github.ref_name }}
+        files: build/libs/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
