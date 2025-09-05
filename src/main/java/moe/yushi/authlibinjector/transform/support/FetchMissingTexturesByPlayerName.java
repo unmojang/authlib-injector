@@ -158,11 +158,7 @@ public class FetchMissingTexturesByPlayerName implements TransformUnit {
                             hookedMethodVisitor.visitVarInsn(ALOAD, 0);
                             // Load `profile`
                             hookedMethodVisitor.visitVarInsn(ALOAD, 1);
-                            hookedMethodVisitor.visitMethodInsn(INVOKESTATIC,
-                                "moe/yushi/authlibinjector/transform/support/FetchMissingTexturesByPlayerName",
-                                "getPackedTextures",
-                                "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-                                false);
+                            ctx.invokeCallback(hookedMethodVisitor, FetchMissingTexturesByPlayerName.class, "getPackedTextures");
 
                             hookedMethodVisitor.visitTypeInsn(CHECKCAST, "com/mojang/authlib/properties/Property");
                             hookedMethodVisitor.visitInsn(ARETURN);
@@ -187,11 +183,7 @@ public class FetchMissingTexturesByPlayerName implements TransformUnit {
                             hookedMethodVisitor.visitVarInsn(ALOAD, 1);
                             // Load `requireSecure`
                             hookedMethodVisitor.visitVarInsn(ILOAD, 2);
-                            hookedMethodVisitor.visitMethodInsn(INVOKESTATIC,
-                                "moe/yushi/authlibinjector/transform/support/FetchMissingTexturesByPlayerName",
-                                "getTextures",
-                                "(Ljava/lang/Object;Ljava/lang/Object;Z)Ljava/lang/Object;",
-                                false);
+                            ctx.invokeCallback(hookedMethodVisitor, FetchMissingTexturesByPlayerName.class, "getTextures");
 
                             hookedMethodVisitor.visitTypeInsn(CHECKCAST, "java/util/Map");
                             hookedMethodVisitor.visitInsn(ARETURN);
